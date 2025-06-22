@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parkr Valet - Enterprise Parking Solutions</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-blue: #1e40af; /* Indigo 800 */
+            --primary-blue-light: #3b82f6; /* Blue 500 */
+            --primary-blue-dark: #1e3a8a; /* Indigo 700 */
+            --accent-blue: #60a5fa; /* Blue 400 */
+            --success-green: #10b981; /* Emerald 500 */
+            --warning-amber: #f59e0b; /* Amber 500 */
+            --error-red: #ef4444; /* Red 500 */
+            --neutral-50: #f8fafc;
+            --neutral-100: #f1f5f9;
+            --neutral-200: #e2e8f0;
+            --neutral-300: #cbd5e1;
+            --neutral-400: #94a3b8;
+            --neutral-500: #64748b;
+            --neutral-600: #475569;
+            --neutral-700: #334155;
+            --neutral-800: #1e293b; /* Slate 800 */
+            --neutral-900: #0f172a; /* Slate 900 */
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.7; /* Slightly increased line height for better readability */
+            color: var(--neutral-800);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Retained original background */
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            max-width: 430px; /* Mobile-first approach */
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            position: relative;
+            box-shadow: var(--shadow-2xl);
+            overflow: hidden; /* Ensures rounded corners are respected */
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .glass-dark {
+            background: rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .premium-gradient {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-light) 50%, var(--accent-blue) 100%);
+        }
+
+        .button-primary {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-light) 100%);
+            color: white;
+            border: none;
+            border-radius: 16px; /* Slightly more rounded */
+            padding: 16px 32px; /* Increased horizontal padding */
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+            display: inline-flex; /* To align icon and text better */
+            align-items: center;
+            justify-content: center;
+        }
+
+        .button-primary:hover {
+            transform: translateY(-3px); /* More pronounced hover effect */
+            box-shadow: var(--shadow-xl);
+        }
+        .button-primary:active {
+            transform: translateY(0);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .button-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .button-primary:hover::before {
+            left: 100%;
+        }
+
+        .card-premium {
+            background: white;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--neutral-100);
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            cursor: pointer; /* Make cards explicitly clickable */
+        }
+
+        .card-premium:hover {
+            transform: translateY(-5px); /* Larger hover lift */
+            box-shadow: var(--shadow-xl);
+        }
+
+        .floating-card {
+            position: absolute;
+            z-index: 10;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.9); /* Slightly more opaque for better contrast */
+            backdrop-filter: blur(25px); /* Increased blur */
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.25); /* Slightly stronger border */
+            box-shadow: var(--shadow-xl);
+        }
+
+        .icon-container {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px; /* Slightly more rounded */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .map-container {
+            position: relative;
+            height: 60vh;
+            background: linear-gradient(45deg, #e3f2fd 0%, #bbdefb 100%); /* Lighter blue gradient */
+            border-radius: 0;
+            overflow: hidden;
+            border-bottom: 1px solid var(--neutral-100); /* Subtle border */
+        }
+
+        .map-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%23e2e8f0" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.2; /* Reduced opacity for subtlety */
+        }
+
+        .parking-spot {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: var(--primary-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            box-shadow: var(--shadow-lg);
+            animation: pulse 2s infinite;
+        }
+
+        .parking-spot:hover {
+            transform: scale(1.2);
+            z-index: 20;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(30, 64, 175, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(30, 64, 175, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(30, 64, 175, 0);
+            }
+        }
+
+        .slide-up {
+            animation: slideUp 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards; /* Added forwards to keep the final state */
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .loading-dots {
+            display: inline-block;
+        }
+
+        .loading-dots::after {
+            content: '';
+            animation: dots 1.5s steps(4, end) infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
+
+        .premium-input {
+            background: var(--neutral-50);
+            border: 2px solid var(--neutral-200);
+            border-radius: 16px; /* More rounded */
+            padding: 16px 20px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            width: 100%;
+            font-family: 'Inter', sans-serif; /* Explicitly set font */
+        }
+
+        .premium-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.15); /* More prominent focus ring */
+        }
+
+        .bottom-sheet {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 430px;
+            background: white;
+            border-radius: 24px 24px 0 0;
+            padding: 24px;
+            box-shadow: var(--shadow-2xl);
+            z-index: 100;
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        .bottom-sheet.hidden {
+            transform: translateX(-50%) translateY(100%);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6); /* Darker overlay */
+            backdrop-filter: blur(10px); /* Increased blur */
+            -webkit-backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 24px;
+            padding: 32px;
+            max-width: 90%;
+            width: 400px;
+            box-shadow: var(--shadow-2xl);
+            transform: scale(0.95); /* Start slightly smaller */
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 14px; /* Slightly larger padding */
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-available {
+            background: rgba(16, 185, 129, 0.15); /* Slightly more visible background */
+            color: var(--success-green);
+        }
+
+        .status-reserved {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--warning-amber);
+        }
+
+        .status-occupied {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--error-red);
+        }
+
+        .price-tag {
+            background: linear-gradient(135deg, var(--success-green) 0%, #059669 100%);
+            color: white;
+            padding: 10px 20px; /* Larger padding */
+            border-radius: 16px; /* More rounded */
+            font-weight: 700;
+            font-size: 16px;
+            box-shadow: var(--shadow-md);
+            display: inline-block; /* Ensure proper rendering */
+        }
+
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--neutral-100);
+            padding: 16px 24px; /* Increased padding */
+        }
+
+        .ripple {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ripple::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.5);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .ripple:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 16px 24px;
+            border-radius: 16px;
+            box-shadow: var(--shadow-xl);
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            max-width: calc(100% - 40px); /* Ensure it doesn't overflow */
+            box-sizing: border-box;
+        }
+
+        .notification.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .micro-interaction {
+            transition: all 0.2s cubic-bezier(0.4, 0.0, 0.2, 1);
+            cursor: pointer; /* Ensure all interactive elements have a pointer cursor */
+        }
+
+        .micro-interaction:hover {
+            transform: scale(1.08); /* Slightly larger hover */
+        }
+
+        .micro-interaction:active {
+            transform: scale(0.92); /* More pronounced active state */
+        }
+
+        @media (min-width: 768px) {
+            .app-container {
+                max-width: 600px;
+                margin: 20px auto;
+                border-radius: 24px; /* Larger radius for larger screens */
+                overflow: hidden;
+            }
+        }
+
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-light) 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            color: white;
+        }
+
+        .logo-animation {
+            font-size: 56px; /* Larger logo */
+            font-weight: 800;
+            margin-bottom: 24px;
+            animation: logoScale 2s ease-in-out infinite alternate;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.2); /* Subtle text shadow */
+        }
+
+        @keyframes logoScale {
+            from {
+                transform: scale(1);
+            }
+            to {
+                transform: scale(1.05); /* Subtle scaling */
+            }
+        }
+
+        .loading-bar {
+            width: 200px;
+            height: 6px; /* Thicker loading bar */
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .loading-progress {
+            height: 100%;
+            background: white;
+            border-radius: 3px;
+            animation: progress 2s ease-in-out forwards; /* Ensure it stays at 100% */
+        }
+
+        @keyframes progress {
+            from {
+                width: 0%;
+            }
+            to {
+                width: 100%;
+            }
+        }
+
+        .premium-badge {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #1a202c;
+            padding: 5px 14px; /* Slightly larger */
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .feature-highlight {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-highlight::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% {
+                left: -100%;
+            }
+            100% {
+                left: 100%;
+            }
+        }
+
+        /* Custom styles for better interactive feedback */
+        .interactive-element {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .interactive-element:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: var(--shadow-xl);
+        }
+        .interactive-element:active {
+            transform: translateY(0) scale(0.98);
+            box-shadow: var(--shadow-lg);
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading-screen">
+        <div class="logo-animation">🅿️ Parkr</div>
+        <p class="text-xl mb-8 opacity-90 font-medium">Premium Parking Solutions</p>
+        <div class="loading-bar">
+            <div class="loading-progress"></div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        <i class="fas fa-check-circle text-green-500 text-xl"></i>
+        <span id="notificationText" class="text-sm">Notification message</span>
+    </div>
+
+    <!-- App Container -->
+    <div class="app-container">
+        <!-- Navigation Header -->
+        <nav class="navbar">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-primary-blue to-primary-blue-light rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-md">
+                        🅿️
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-extrabold text-gray-900">Parkr Valet</h1>
+                        <p class="text-sm text-gray-500 -mt-1">Find your perfect spot</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-3">
+                    <button class="w-10 h-10 bg-gray-100 rounded-xl flex items-center justify-center text-gray-600 shadow-sm interactive-element">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <button class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 shadow-sm interactive-element">
+                        <i class="fas fa-user"></i>
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main id="mainContent" style="display: none;">
+            <!-- Search Section -->
+            <section class="px-6 py-8 bg-gradient-to-br from-blue-50 to-white">
+                <div class="mb-8">
+                    <h2 class="text-3xl font-extrabold text-gray-900 mb-2">Where are you going?</h2>
+                    <p class="text-gray-600 text-base">Reserve your parking spot in advance and skip the hassle.</p>
+                </div>
+
+                <div class="relative mb-8">
+                    <div class="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-gray-400 text-lg"></i>
+                    </div>
+                    <input 
+                        type="text" 
+                        class="premium-input pl-14 text-lg py-4" /* Increased input size */
+                        placeholder="Search for parking locations..."
+                        id="searchInput"
+                    >
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="grid grid-cols-2 gap-5 mb-8">
+                    <button class="card-premium text-left interactive-element px-5 py-6" onclick="selectLocation('downtown')">
+                        <div class="flex items-center space-x-4">
+                            <div class="icon-container bg-gradient-to-br from-blue-100 to-blue-200 text-blue-600">
+                                <i class="fas fa-building text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-900 text-lg">Downtown</h3>
+                                <p class="text-sm text-gray-500">Business District</p>
+                            </div>
+                        </div>
+                    </button>
+
+                    <button class="card-premium text-left interactive-element px-5 py-6" onclick="selectLocation('legacy')">
+                        <div class="flex items-center space-x-4">
+                            <div class="icon-container bg-gradient-to-br from-green-100 to-green-200 text-green-600">
+                                <i class="fas fa-shopping-bag text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-gray-900 text-lg">Legacy</h3>
+                                <p class="text-sm text-gray-500">Shopping & Dining</p>
+                            </div>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- Saved Places -->
+                <div class="card-premium">
+                    <h3 class="text-xl font-extrabold text-gray-900 mb-5">Saved Places</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-4 p-4 bg-neutral-50 rounded-xl interactive-element cursor-pointer" onclick="scrollToLocation('home')">
+                            <div class="icon-container bg-gradient-to-br from-blue-100 to-blue-200 text-blue-600 w-12 h-12">
+                                <i class="fas fa-home text-base"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-semibold text-gray-900">Home</p>
+                                <p class="text-sm text-gray-500">123 Main St, Dallas, TX</p>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+                        </div>
+
+                        <div class="flex items-center space-x-4 p-4 bg-neutral-50 rounded-xl interactive-element cursor-pointer" onclick="scrollToLocation('work')">
+                            <div class="icon-container bg-gradient-to-br from-purple-100 to-purple-200 text-purple-600 w-12 h-12">
+                                <i class="fas fa-briefcase text-base"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-semibold text-gray-900">Work</p>
+                                <p class="text-sm text-gray-500">456 Business Ave, Dallas, TX</p>
+                            </div>
+                            <i class="fas fa-chevron-right text-gray-400"></i>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Map View -->
+            <section id="mapSection" class="relative" style="display: none;">
+                <div class="navbar p-4 flex items-center justify-between">
+                    <button onclick="showHome()" class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-gray-600 shadow-md interactive-element">
+                        <i class="fas fa-arrow-left text-lg"></i>
+                    </button>
+                    
+                    <div class="text-center">
+                        <h2 class="font-bold text-gray-900 text-lg" id="locationTitle">Downtown Dallas</h2>
+                        <p class="text-sm text-gray-500">12 spots available</p>
+                    </div>
+
+                    <button class="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-gray-600 shadow-md interactive-element">
+                        <i class="fas fa-filter text-lg"></i>
+                    </button>
+                </div>
+
+                <!-- Map Container -->
+                <div class="map-container relative">
+                    <div class="map-overlay"></div>
+                    
+                    <!-- Parking Spots -->
+                    <div class="parking-spot" style="top: 30%; left: 25%;" onclick="selectSpot('spot1', '$15', '2min walk')" data-price="$15">
+                        🅿️
+                    </div>
+                    <div class="parking-spot" style="top: 45%; left: 40%;" onclick="selectSpot('spot2', '$18', '1min walk')" data-price="$18">
+                        🅿️
+                    </div>
+                    <div class="parking-spot" style="top: 35%; left: 60%;" onclick="selectSpot('spot3', '$12', '3min walk')" data-price="$12">
+                        🅿️
+                    </div>
+                    <div class="parking-spot" style="top: 60%; left: 35%;" onclick="selectSpot('spot4', '$20', '0min walk')" data-price="$20">
+                        🅿️
+                    </div>
+                    <div class="parking-spot" style="top: 50%; left: 70%; background: var(--success-green);" onclick="selectSpot('spot5', '$10', '4min walk')" data-price="$10">
+                        🅿️
+                    </div>
+
+                    <!-- Floating Search Card -->
+                    <div class="floating-card top-4 left-4 right-4 p-4">
+                        <div class="flex items-center space-x-3">
+                            <div class="flex-1">
+                                <input 
+                                    type="text" 
+                                    class="w-full bg-transparent border-none outline-none text-gray-900 placeholder-gray-500 text-lg p-2"
+                                    placeholder="Search this area..."
+                                >
+                            </div>
+                            <button class="w-10 h-10 bg-gradient-to-br from-primary-blue to-primary-blue-light rounded-xl flex items-center justify-center text-white shadow-md interactive-element">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Current Location Button -->
+                    <button class="floating-card bottom-24 right-4 w-12 h-12 flex items-center justify-center text-blue-600 shadow-md interactive-element">
+                        <i class="fas fa-location-arrow text-xl"></i>
+                    </button>
+                </div>
+
+                <!-- Bottom Actions -->
+                <div class="p-6 bg-white border-t border-neutral-100">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <p class="text-sm text-gray-500">Pricing Range</p>
+                            <p class="text-xl font-extrabold text-gray-900">$10 - $25</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm text-gray-500">Peak Hours</p>
+                            <p class="text-xl font-extrabold text-gray-900">7-9 AM</p>
+                        </div>
+                    </div>
+
+                    <button class="button-primary w-full ripple" onclick="showSpotsList()">
+                        <i class="fas fa-list mr-2"></i>
+                        View All Spots
+                    </button>
+                </div>
+            </section>
+
+            <!-- Spots List -->
+            <section id="spotsListSection" class="p-6" style="display: none;">
+                <div class="flex items-center justify-between mb-6">
+                    <button onclick="showMap()" class="w-12 h-12 bg-neutral-100 rounded-xl flex items-center justify-center text-gray-600 shadow-md interactive-element">
+                        <i class="fas fa-arrow-left text-lg"></i>
+                    </button>
+                    <h2 class="text-xl font-bold text-gray-900">Available Spots</h2>
+                    <button class="w-12 h-12 bg-neutral-100 rounded-xl flex items-center justify-center text-gray-600 shadow-md interactive-element">
+                        <i class="fas fa-sort text-lg"></i>
+                    </button>
+                </div>
+
+                <div class="space-y-5">
+                    <!-- Spot Card 1 -->
+                    <div class="card-premium interactive-element" onclick="selectSpot('spot1', '$15', '2min walk')">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 font-bold text-lg shadow-sm">
+                                    P1
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-900 text-lg">Premium Street Spot</h3>
+                                    <p class="text-sm text-gray-500">Main Street & Commerce</p>
+                                </div>
+                            </div>
+                            <div class="price-tag">$15</div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between text-sm">
+                            <div class="flex items-center space-x-4">
+                                <span class="status-indicator status-available">Available</span>
+                                <span class="text-gray-500">
+                                    <i class="fas fa-walking mr-1 text-xs"></i>
+                                    2min walk
+                                </span>
+                            </div>
+                            <div class="flex items-center text-yellow-500">
+                                <i class="fas fa-star text-sm"></i>
+                                <span class="ml-1 text-gray-600 font-semibold">4.8</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Spot Card 2 -->
+                    <div class="card-premium interactive-element" onclick="selectSpot('spot2', '$18', '1min walk')">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-14 h-14 bg-gradient-to-br from-green-100 to-green-200 rounded-xl flex items-center justify-center text-green-600 font-bold text-lg shadow-sm">
+                                    P2
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-900 text-lg">VIP Garage Spot</h3>
+                                    <p class="text-sm text-gray-500">Downtown Parking Garage</p>
+                                </div>
+                            </div>
+                            <div class="price-tag">$18</div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between text-sm">
+                            <div class="flex items-center space-x-4">
+                                <span class="status-indicator status-available">Available</span>
+                                <span class="text-gray-500">
+                                    <i class="fas fa-walking mr-1 text-xs"></i>
+                                    1min walk
+                                </span>
+                                <span class="premium-badge">VIP</span>
+                            </div>
+                            <div class="flex items-center text-yellow-500">
+                                <i class="fas fa-star text-sm"></i>
+                                <span class="ml-1 text-gray-600 font-semibold">4.9</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Spot Card 3 -->
+                    <div class="card-premium interactive-element" onclick="selectSpot('spot3', '$12', '3min walk')">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-14 h-14 bg-gradient-to-br from-purple-100 to-purple-200 rounded-xl flex items-center justify-center text-purple-600 font-bold text-lg shadow-sm">
+                                    P3
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-gray-900 text-lg">Economy Street Spot</h3>
+                                    <p class="text-sm text-gray-500">Elm Street & Field</p>
+                                </div>
+                            </div>
+                            <div class="price-tag" style="background: linear-gradient(135deg, var(--warning-amber) 0%, #d97706 100%);">$12</div>
+                        </div>
+                        
+                        <div class="flex items-center justify-between text-sm">
+                            <div class="flex items-center space-x-4">
+                                <span class="status-indicator status-available">Available</span>
+                                <span class="text-gray-500">
+                                    <i class="fas fa-walking mr-1 text-xs"></i>
+                                    3min walk
+                                </span>
+                            </div>
+                            <div class="flex items-center text-yellow-500">
+                                <i class="fas fa-star text-sm"></i>
+                                <span class="ml-1 text-gray-600 font-semibold">4.6</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom Sheet -->
+        <div id="spotBottomSheet" class="bottom-sheet hidden">
+            <div class="w-12 h-1.5 bg-gray-300 rounded-full mx-auto mb-7 -mt-1"></div>
+            
+            <div class="flex items-center justify-between mb-7">
+                <div class="flex items-center space-x-5">
+                    <div class="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center text-blue-600 font-bold text-xl shadow-sm">
+                        P1
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-extrabold text-gray-900" id="spotTitle">Premium Street Spot</h3>
+                        <p class="text-gray-500" id="spotLocation">Main Street & Commerce</p>
+                        <div class="flex items-center space-x-2 mt-1.5">
+                            <span class="status-indicator status-available">Available</span>
+                            <span class="text-sm text-gray-500" id="spotDistance">2min walk</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-3xl font-extrabold text-blue-600" id="spotPrice">$15</p>
+                    <p class="text-sm text-gray-500">per hour</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 mb-7">
+                <div class="text-center p-4 bg-neutral-50 rounded-xl shadow-sm">
+                    <div class="text-3xl mb-2">🚗</div>
+                    <p class="text-sm text-gray-600 font-medium">Standard Size</p>
+                </div>
+                <div class="text-center p-4 bg-neutral-50 rounded-xl shadow-sm">
+                    <div class="text-3xl mb-2">🛡️</div>
+                    <p class="text-sm text-gray-600 font-medium">Secure</p>
+                </div>
+                <div class="text-center p-4 bg-neutral-50 rounded-xl shadow-sm">
+                    <div class="text-3xl mb-2">📍</div>
+                    <p class="text-sm text-gray-600 font-medium">Easy Access</p>
+                </div>
+            </div>
+
+            <div class="mb-7">
+                <h4 class="font-bold text-gray-900 mb-3 text-lg">Parker Information</h4>
+                <div class="flex items-center space-x-4 p-4 bg-blue-50 rounded-xl shadow-md">
+                    <div class="w-12 h-12 bg-gradient-to-br from-primary-blue to-primary-blue-light rounded-full flex items-center justify-center text-white font-bold text-lg">
+                        A
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-semibold text-gray-900">Alex Johnson</p>
+                        <div class="flex items-center space-x-2 mt-1">
+                            <div class="flex items-center text-yellow-500">
+                                <i class="fas fa-star text-sm"></i>
+                                <span class="ml-1 text-sm text-gray-600 font-semibold">4.9</span>
+                            </div>
+                            <span class="text-sm text-gray-500">• 127 spots reserved</span>
+                        </div>
+                    </div>
+                    <div class="w-3 h-3 bg-green-500 rounded-full shadow-lg animate-pulse"></div>
+                </div>
+            </div>
+
+            <div class="flex space-x-3 pt-4 border-t border-neutral-100">
+                <button class="flex-1 bg-neutral-100 text-gray-700 py-4 rounded-2xl font-semibold interactive-element" onclick="hideBottomSheet()">
+                    Cancel
+                </button>
+                <button class="flex-1 button-primary ripple" onclick="bookSpot()">
+                    <i class="fas fa-credit-card mr-2"></i>
+                    Reserve Now
+                </button>
+            </div>
+        </div>
+
+        <!-- Modal Overlay -->
+        <div id="modalOverlay" class="modal-overlay">
+            <div class="modal-content">
+                <div class="text-center">
+                    <div class="w-24 h-24 bg-gradient-to-br from-green-100 to-green-200 rounded-full flex items-center justify-center mx-auto mb-7 shadow-lg">
+                        <i class="fas fa-check text-5xl text-green-600"></i>
+                    </div>
+                    <h2 class="text-3xl font-extrabold text-gray-900 mb-4">Booking Confirmed!</h2>
+                    <p class="text-gray-600 mb-8 text-base">Your parking spot has been reserved. The parker will wait for you at the designated location.</p>
+                    
+                    <div class="bg-neutral-50 rounded-xl p-5 mb-8 shadow-inner">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-gray-600">Spot ID:</span>
+                            <span class="font-bold text-gray-800">#PV12345</span>
+                        </div>
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-gray-600">Location:</span>
+                            <span class="font-bold text-gray-800">Main St & Commerce</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-gray-600">Estimated Arrival:</span>
+                            <span class="font-bold text-gray-800">8 minutes</span>
+                        </div>
+                    </div>
+
+                    <div class="flex space-x-3 pt-4 border-t border-neutral-100">
+                        <button class="flex-1 bg-neutral-100 text-gray-700 py-3 rounded-xl font-semibold interactive-element" onclick="hideModal()">
+                            Close
+                        </button>
+                        <button class="flex-1 button-primary" onclick="startNavigation()">
+                            <i class="fas fa-navigation mr-2"></i>
+                            Navigate
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // App State Management
+        let currentLocation = '';
+        let selectedSpot = null;
+        let isLoading = false;
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                document.getElementById('loadingScreen').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+                showNotification('Welcome to Parkr Valet! 🅿️', 'success');
+            }, 2000); /* Reduced loading time slightly */
+        });
+
+        // Navigation Functions
+        function showHome() {
+            document.getElementById('mapSection').style.display = 'none';
+            document.getElementById('spotsListSection').style.display = 'none';
+            document.querySelector('main').style.display = 'block';
+            document.querySelector('section:first-child').style.display = 'block';
+            document.body.style.overflowY = 'auto'; /* Re-enable scrolling */
+        }
+
+        function showMap() {
+            document.querySelector('section:first-child').style.display = 'none';
+            document.getElementById('spotsListSection').style.display = 'none';
+            document.getElementById('mapSection').style.display = 'block';
+            document.body.style.overflowY = 'hidden'; /* Disable scrolling when map is active */
+        }
+
+        function showSpotsList() {
+            document.getElementById('mapSection').style.display = 'none';
+            document.getElementById('spotsListSection').style.display = 'block';
+            document.body.style.overflowY = 'auto'; /* Re-enable scrolling */
+        }
+
+        // Location Selection
+        function selectLocation(location) {
+            currentLocation = location;
+            const title = location === 'downtown' ? 'Downtown Dallas' : 'Legacy Plano';
+            document.getElementById('locationTitle').textContent = title;
+            
+            // Add loading animation
+            showLoadingState();
+            
+            setTimeout(() => {
+                hideLoadingState();
+                showMap();
+                showNotification(`Showing parking spots in ${title}`, 'info');
+            }, 800); /* Faster transition */
+        }
+
+        // Spot Selection
+        function selectSpot(spotId, price, distance) {
+            selectedSpot = { id: spotId, price: price, distance: distance };
+            
+            // Update bottom sheet content
+            document.getElementById('spotTitle').textContent = event.target.closest('.card-premium').querySelector('h3').textContent;
+            document.getElementById('spotLocation').textContent = event.target.closest('.card-premium').querySelector('p:last-of-type').textContent;
+            document.getElementById('spotPrice').textContent = price;
+            document.getElementById('spotDistance').textContent = distance;
+            
+            // Add ripple effect to spot
+            const spotElement = event.target.closest('.parking-spot') || event.target;
+            if (spotElement && spotElement.classList.contains('parking-spot')) {
+                spotElement.style.transform = 'scale(1.3)';
+                setTimeout(() => {
+                    spotElement.style.transform = 'scale(1)';
+                }, 200);
+            }
+            
+            showBottomSheet();
+        }
+
+        // Bottom Sheet Management
+        function showBottomSheet() {
+            const bottomSheet = document.getElementById('spotBottomSheet');
+            bottomSheet.classList.remove('hidden');
+            bottomSheet.classList.add('slide-up');
+            document.body.style.overflowY = 'hidden'; /* Prevent background scroll */
+        }
+
+        function hideBottomSheet() {
+            const bottomSheet = document.getElementById('spotBottomSheet');
+            bottomSheet.classList.add('hidden');
+            document.body.style.overflowY = 'auto'; /* Re-enable background scroll */
+        }
+
+        // Booking Process
+        function bookSpot() {
+            if (!selectedSpot) return;
+            
+            hideBottomSheet();
+            showLoadingState();
+            
+            // Simulate booking API call
+            setTimeout(() => {
+                hideLoadingState();
+                showModal();
+                showNotification('Booking successful! 🎉', 'success');
+            }, 1500); /* Faster booking simulation */
+        }
+
+        // Modal Management
+        function showModal() {
+            const modal = document.getElementById('modalOverlay');
+            modal.classList.add('active');
+        }
+
+        function hideModal() {
+            const modal = document.getElementById('modalOverlay');
+            modal.classList.remove('active');
+        }
+
+        function startNavigation() {
+            hideModal();
+            showNotification('Starting navigation... 🗺️', 'info');
+            
+            // Simulate navigation start
+            setTimeout(() => {
+                showNotification('ETA: 8 minutes to your parker', 'info');
+            }, 1000);
+        }
+
+        // Notification System
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            const text = document.getElementById('notificationText');
+            const icon = notification.querySelector('i');
+            
+            text.textContent = message;
+            
+            // Update icon and color based on type
+            let iconClass = '';
+            let colorClass = '';
+            switch (type) {
+                case 'success':
+                    iconClass = 'fas fa-check-circle';
+                    colorClass = 'text-green-500';
+                    break;
+                case 'error':
+                    iconClass = 'fas fa-exclamation-circle';
+                    colorClass = 'text-red-500';
+                    break;
+                case 'info':
+                default:
+                    iconClass = 'fas fa-info-circle';
+                    colorClass = 'text-blue-500';
+                    break;
+            }
+            icon.className = `${iconClass} ${colorClass} text-xl`; // Update icon and color
+            
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000); /* Increased duration */
+        }
+
+        // Loading State Management
+        function showLoadingState() {
+            isLoading = true;
+            // Add skeleton loading to cards
+            const cards = document.querySelectorAll('.card-premium, .button-primary');
+            cards.forEach(card => {
+                card.style.opacity = '0.7';
+                card.style.pointerEvents = 'none';
+                card.classList.add('skeleton'); /* Apply skeleton class */
+            });
+        }
+
+        function hideLoadingState() {
+            isLoading = false;
+            const cards = document.querySelectorAll('.card-premium, .button-primary');
+            cards.forEach(card => {
+                card.style.opacity = '1';
+                card.style.pointerEvents = 'auto';
+                card.classList.remove('skeleton'); /* Remove skeleton class */
+            });
+        }
+
+        // Search Functionality
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase();
+            
+            if (query.length > 0) { /* Show notification even for shorter queries */
+                showNotification(`Searching for "${query}"...`, 'info');
+            }
+            // Implement actual search filtering logic here if needed
+        });
+
+        // Enhanced touch interactions for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+        const SWIPE_THRESHOLD = 50; // Pixels to consider a swipe
+
+        document.addEventListener('touchstart', function(e) {
+            touchStartX = e.touches[0].clientX;
+            document.getElementById('spotBottomSheet').style.transition = 'transform 0.3s ease-out'; // Ensure smooth transition for dragging
+        });
+
+        document.addEventListener('touchmove', function(e) {
+            const bottomSheet = document.getElementById('spotBottomSheet');
+            if (!bottomSheet.classList.contains('hidden')) {
+                const touchCurrentX = e.touches[0].clientX;
+                const deltaX = touchCurrentX - touchStartX;
+                
+                // Only allow horizontal swipe to close if it's a significant drag
+                if (Math.abs(deltaX) > SWIPE_THRESHOLD) {
+                    bottomSheet.style.transform = `translateX(calc(-50% + ${deltaX}px))`;
+                }
+            }
+        });
+
+        document.addEventListener('touchend', function(e) {
+            const bottomSheet = document.getElementById('spotBottomSheet');
+            if (!bottomSheet.classList.contains('hidden')) {
+                touchEndX = e.changedTouches[0].clientX;
+                const deltaX = touchEndX - touchStartX;
+
+                if (Math.abs(deltaX) > SWIPE_THRESHOLD && deltaX > 0) { // Swiped right to close
+                    hideBottomSheet();
+                } else if (bottomSheet.style.transform !== 'translateX(-50%)') {
+                    // If not closed, snap back to original position
+                    bottomSheet.style.transform = 'translateX(-50%)';
+                }
+            }
+        });
+
+        // Add focus management for accessibility
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Tab') {
+                document.body.classList.add('keyboard-navigation');
+            }
+        });
+
+        document.addEventListener('mousedown', function() {
+            document.body.classList.remove('keyboard-navigation');
+        });
+
+        // Performance optimization: Observe elements for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px' /* Start animation slightly earlier */
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                    observer.unobserve(entry.target); // Only animate once
+                }
+            });
+        }, observerOptions);
+
+        // Observe all cards for fade-in animation
+        document.querySelectorAll('.card-premium').forEach(card => {
+            observer.observe(card);
+        });
+
+        // Add premium features showcase (optional, could be triggered by a button)
+        function showPremiumFeatures() {
+            const features = [
+                'AI-powered spot prediction',
+                'Guaranteed parking availability',
+                'VIP parker service',
+                'Contactless transactions',
+                'Real-time spot tracking'
+            ];
+            
+            features.forEach((feature, index) => {
+                setTimeout(() => {
+                    showNotification(`✨ ${feature}`, 'info');
+                }, index * 800); /* Faster display of features */
+            });
+        }
+
+        // Show premium features on app start (after initial loading)
+        setTimeout(showPremiumFeatures, 4000);
+    </script>
+</body>
+</html>
