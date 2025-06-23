@@ -976,6 +976,7 @@
         let isLoading = false;
         let map = null; // Variable to hold the map instance
         let mapInitializedWithOptions = false; // Flag to check if view, tiles, markers are set
+        let currentMapLocation = 'downtown'; // To keep track of current location context
 
         // Initialize App
         document.addEventListener('DOMContentLoaded', function() {
@@ -983,37 +984,77 @@
                 document.getElementById('loadingScreen').style.display = 'none';
                 document.getElementById('mainContent').style.display = 'block';
                 showNotification('Welcome to Parkr Valet! 🅿️', 'success');
-                // Create map instance if container exists, but don't set view/layers yet
                 if (document.getElementById('leafletMap') && !map) {
-                    map = L.map('leafletMap', {
-                        // Deferring setView to when the map is actually shown
-                    });
+                    map = L.map('leafletMap', {});
                 }
             }, 2500);
         });
 
-        function initializeMapWithOptions() {
-            if (map && !mapInitializedWithOptions) { // Only if map exists and not fully initialized
-                map.setView([32.7767, -96.7970], 13); // Dallas, TX coordinates
+        function updateMapViewAndMarkers(locationType) {
+            if (!map) return;
 
+            currentMapLocation = locationType; // Update current location
+
+            // Clear existing markers first
+            map.eachLayer(layer => {
+                if (layer instanceof L.Marker) {
+                    map.removeLayer(layer);
+                }
+            });
+
+            let viewCoordinates, zoomLevel;
+            if (locationType === 'downtown') {
+                viewCoordinates = [32.7767, -96.7970]; // Dallas
+                zoomLevel = 13;
+            } else if (locationType === 'legacy') {
+                viewCoordinates = [33.0760, -96.8230]; // Legacy West, Plano
+                zoomLevel = 15; // Zoom in a bit more for a smaller area
+            }
+
+            map.setView(viewCoordinates, zoomLevel);
+
+            if (!mapInitializedWithOptions) { // Add tile layer only once
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 }).addTo(map);
-                addParkingMarkers(); // Add markers after map initialization
-                mapInitializedWithOptions = true;
+                mapInitializedWithOptions = true; // Mark tile layer as initialized
             }
+
+            addParkingMarkers(locationType); // Add new markers for the location
+            map.invalidateSize(); // Ensure map size is correct
         }
 
-        function addParkingMarkers() {
+
+        function addParkingMarkers(locationType = 'downtown') {
             if (!map) return;
 
-            const spotsData = [
-                { id: 'spot1', lat: 32.7800, lng: -96.8000, price: '$15', walk: '2min walk', name: 'Premium Street Spot', location: 'Main Street & Commerce', available: true },
-                { id: 'spot2', lat: 32.7790, lng: -96.7950, price: '$18', walk: '1min walk', name: 'VIP Garage Spot', location: 'Downtown Parking Garage', available: true, vip: true },
-                { id: 'spot3', lat: 32.7750, lng: -96.7900, price: '$12', walk: '3min walk', name: 'Economy Street Spot', location: 'Elm Street & Field', available: true },
-                { id: 'spot4', lat: 32.7780, lng: -96.8050, price: '$20', walk: '0min walk', name: 'Executive Lot', location: 'Commerce & Akard', available: false }, // Example of not available
-                { id: 'spot5', lat: 32.7760, lng: -96.7920, price: '$10', walk: '4min walk', name: 'Budget Friendly Spot', location: 'Near West End', available: true, color: 'var(--success-green)' }
-            ];
+            // Clear existing markers
+            map.eachLayer(layer => {
+                if (layer instanceof L.Marker) {
+                    map.removeLayer(layer);
+                }
+            });
+
+            let spotsData = [];
+            if (locationType === 'downtown') {
+                spotsData = [
+                    { id: 'spot1', lat: 32.7800, lng: -96.8000, price: '$15', walk: '2min walk', name: 'Premium Street Spot', location: 'Main Street & Commerce', available: true },
+                    { id: 'spot2', lat: 32.7790, lng: -96.7950, price: '$18', walk: '1min walk', name: 'VIP Garage Spot', location: 'Downtown Parking Garage', available: true, vip: true },
+                    { id: 'spot3', lat: 32.7750, lng: -96.7900, price: '$12', walk: '3min walk', name: 'Economy Street Spot', location: 'Elm Street & Field', available: true },
+                    { id: 'spot4', lat: 32.7780, lng: -96.8050, price: '$20', walk: '0min walk', name: 'Executive Lot', location: 'Commerce & Akard', available: false },
+                    { id: 'spot5', lat: 32.7760, lng: -96.7920, price: '$10', walk: '4min walk', name: 'Budget Friendly Spot', location: 'Near West End', available: true }
+                ];
+            } else if (locationType === 'legacy') {
+                spotsData = [
+                    // Legacy West, Plano, TX - Coordinates around 33.076, -96.823
+                    { id: 'legacy1', lat: 33.0770, lng: -96.8240, price: '$20', walk: '1min walk', name: 'Legacy Garage A', location: 'Near Shops at Legacy', available: true, vip: true },
+                    { id: 'legacy2', lat: 33.0750, lng: -96.8220, price: '$18', walk: '3min walk', name: 'Legacy Surface Lot B', location: 'Windrose Ave', available: true },
+                    { id: 'legacy3', lat: 33.0780, lng: -96.8250, price: '$22', walk: '0min walk', name: 'Valet Parking Legacy', location: 'Front of Main Restaurant Row', available: true },
+                    { id: 'legacy4', lat: 33.0740, lng: -96.8210, price: '$15', walk: '5min walk', name: 'Economy Lot C', location: 'Legacy Drive South', available: true },
+                    { id: 'legacy5', lat: 33.0765, lng: -96.8235, price: '$25', walk: '1min walk', name: 'Premium Covered Parking', location: 'Near Food Hall', available: false, vip: true }
+                ];
+            }
+
 
             // Custom Icon
             const parkingIcon = L.divIcon({
@@ -1056,23 +1097,20 @@
             document.querySelector('section:first-child').style.display = 'block';
         }
 
-        function showMap() {
+        function showMap(locationType = 'downtown') { // Default to downtown or use currentMapLocation
             document.querySelector('section:first-child').style.display = 'none';
             document.getElementById('spotsListSection').style.display = 'none';
             const mapSection = document.getElementById('mapSection');
             mapSection.style.display = 'block';
 
-            if (!map && document.getElementById('leafletMap')) { // If map instance wasn't created yet
-                 map = L.map('leafletMap'); // Create instance
+            if (!map && document.getElementById('leafletMap')) {
+                 map = L.map('leafletMap');
             }
 
             if (map) {
-                if (!mapInitializedWithOptions) {
-                    initializeMapWithOptions(); // Set view, tiles, markers now that container is visible
-                }
-                setTimeout(() => {
-                    map.invalidateSize(); // Ensure size is correct after display and initialization
-                }, 10); // A small delay can help ensure the container is fully rendered
+                // If a specific locationType is passed (e.g. from selectLocation), use it.
+                // Otherwise, it might be a call from navigating back to map, so use currentMapLocation.
+                updateMapViewAndMarkers(locationType || currentMapLocation);
             }
         }
 
@@ -1092,7 +1130,8 @@
             
             setTimeout(() => {
                 hideLoadingState();
-                showMap();
+                currentMapLocation = location; // Update the global currentMapLocation
+                showMap(location); // Pass the selected location to showMap
                 showNotification(`Showing parking spots in ${title}`, 'info');
             }, 1000);
         }
