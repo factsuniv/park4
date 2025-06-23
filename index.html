@@ -975,6 +975,7 @@
         let selectedSpot = null;
         let isLoading = false;
         let map = null; // Variable to hold the map instance
+        let mapInitializedWithOptions = false; // Flag to check if view, tiles, markers are set
 
         // Initialize App
         document.addEventListener('DOMContentLoaded', function() {
@@ -982,18 +983,24 @@
                 document.getElementById('loadingScreen').style.display = 'none';
                 document.getElementById('mainContent').style.display = 'block';
                 showNotification('Welcome to Parkr Valet! 🅿️', 'success');
-                initializeMap(); // Initialize map after main content is visible
+                // Create map instance if container exists, but don't set view/layers yet
+                if (document.getElementById('leafletMap') && !map) {
+                    map = L.map('leafletMap', {
+                        // Deferring setView to when the map is actually shown
+                    });
+                }
             }, 2500);
         });
 
-        function initializeMap() {
-            if (document.getElementById('leafletMap') && !map) { // Check if map container exists and map not already initialized
-                map = L.map('leafletMap').setView([32.7767, -96.7970], 13); // Dallas, TX coordinates
+        function initializeMapWithOptions() {
+            if (map && !mapInitializedWithOptions) { // Only if map exists and not fully initialized
+                map.setView([32.7767, -96.7970], 13); // Dallas, TX coordinates
 
                 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 }).addTo(map);
                 addParkingMarkers(); // Add markers after map initialization
+                mapInitializedWithOptions = true;
             }
         }
 
@@ -1052,17 +1059,20 @@
         function showMap() {
             document.querySelector('section:first-child').style.display = 'none';
             document.getElementById('spotsListSection').style.display = 'none';
-            document.getElementById('mapSection').style.display = 'block';
-            // Ensure map is initialized and sized correctly when shown
+            const mapSection = document.getElementById('mapSection');
+            mapSection.style.display = 'block';
+
+            if (!map && document.getElementById('leafletMap')) { // If map instance wasn't created yet
+                 map = L.map('leafletMap'); // Create instance
+            }
+
             if (map) {
+                if (!mapInitializedWithOptions) {
+                    initializeMapWithOptions(); // Set view, tiles, markers now that container is visible
+                }
                 setTimeout(() => {
-                    map.invalidateSize();
-                }, 10);
-            } else {
-                initializeMap(); // Initialize if not already
-                 setTimeout(() => { // Ensure DOM is ready for map
-                    if(map) map.invalidateSize();
-                }, 10);
+                    map.invalidateSize(); // Ensure size is correct after display and initialization
+                }, 10); // A small delay can help ensure the container is fully rendered
             }
         }
 
