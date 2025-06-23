@@ -7,6 +7,8 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     
     <style>
         :root {
@@ -510,6 +512,30 @@
             }
         }
 
+        .parking-spot-map-icon {
+            width: 30px;
+            height: 30px;
+            background-color: var(--primary-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            border: 2px solid white;
+            box-shadow: 0 0 5px rgba(0,0,0,0.3);
+        }
+        .parking-spot-map-icon.vip {
+            background-color: var(--accent-green); /* Or a different color for VIP */
+            border: 2px solid gold;
+        }
+        .custom-leaflet-div-icon {
+            background: transparent !important; /* Remove Leaflet's default white square */
+            border: none !important; /* Remove Leaflet's default border */
+        }
+
+
         .premium-badge {
             background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
             color: #1a202c;
@@ -682,28 +708,11 @@
                 </div>
 
                 <!-- Map Container -->
-                <div class="map-container relative">
-                    <div class="map-overlay"></div>
-                    
-                    <!-- Parking Spots -->
-                    <div class="parking-spot" style="top: 30%; left: 25%;" onclick="selectSpot('spot1', '$15', '2min walk')" data-price="$15">
-                        P
-                    </div>
-                    <div class="parking-spot" style="top: 45%; left: 40%;" onclick="selectSpot('spot2', '$18', '1min walk')" data-price="$18">
-                        P
-                    </div>
-                    <div class="parking-spot" style="top: 35%; left: 60%;" onclick="selectSpot('spot3', '$12', '3min walk')" data-price="$12">
-                        P
-                    </div>
-                    <div class="parking-spot" style="top: 60%; left: 35%;" onclick="selectSpot('spot4', '$20', '0min walk')" data-price="$20">
-                        P
-                    </div>
-                    <div class="parking-spot" style="top: 50%; left: 70%; background: var(--success-green);" onclick="selectSpot('spot5', '$10', '4min walk')" data-price="$10">
-                        P
-                    </div>
+                <div id="leafletMap" class="map-container relative">
+                    <!-- Leaflet map will be initialized here -->
 
-                    <!-- Floating Search Card -->
-                    <div class="floating-card top-4 left-4 right-4 p-4">
+                    <!-- Floating Search Card (kept for UI consistency, non-functional for now) -->
+                    <div class="floating-card top-4 left-4 right-4 p-4 z-10">
                         <div class="flex items-center space-x-3">
                             <div class="flex-1">
                                 <input 
@@ -718,8 +727,8 @@
                         </div>
                     </div>
 
-                    <!-- Current Location Button -->
-                    <button class="floating-card bottom-24 right-4 w-12 h-12 flex items-center justify-center text-primary-green micro-interaction">
+                    <!-- Current Location Button (kept for UI consistency, non-functional for now) -->
+                    <button class="floating-card bottom-24 right-4 w-12 h-12 flex items-center justify-center text-primary-green micro-interaction z-10">
                         <i class="fas fa-location-arrow"></i>
                     </button>
                 </div>
@@ -965,6 +974,7 @@
         let currentLocation = '';
         let selectedSpot = null;
         let isLoading = false;
+        let map = null; // Variable to hold the map instance
 
         // Initialize App
         document.addEventListener('DOMContentLoaded', function() {
@@ -972,8 +982,64 @@
                 document.getElementById('loadingScreen').style.display = 'none';
                 document.getElementById('mainContent').style.display = 'block';
                 showNotification('Welcome to Parkr Valet! 🅿️', 'success');
+                initializeMap(); // Initialize map after main content is visible
             }, 2500);
         });
+
+        function initializeMap() {
+            if (document.getElementById('leafletMap') && !map) { // Check if map container exists and map not already initialized
+                map = L.map('leafletMap').setView([32.7767, -96.7970], 13); // Dallas, TX coordinates
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
+                addParkingMarkers(); // Add markers after map initialization
+            }
+        }
+
+        function addParkingMarkers() {
+            if (!map) return;
+
+            const spotsData = [
+                { id: 'spot1', lat: 32.7800, lng: -96.8000, price: '$15', walk: '2min walk', name: 'Premium Street Spot', location: 'Main Street & Commerce', available: true },
+                { id: 'spot2', lat: 32.7790, lng: -96.7950, price: '$18', walk: '1min walk', name: 'VIP Garage Spot', location: 'Downtown Parking Garage', available: true, vip: true },
+                { id: 'spot3', lat: 32.7750, lng: -96.7900, price: '$12', walk: '3min walk', name: 'Economy Street Spot', location: 'Elm Street & Field', available: true },
+                { id: 'spot4', lat: 32.7780, lng: -96.8050, price: '$20', walk: '0min walk', name: 'Executive Lot', location: 'Commerce & Akard', available: false }, // Example of not available
+                { id: 'spot5', lat: 32.7760, lng: -96.7920, price: '$10', walk: '4min walk', name: 'Budget Friendly Spot', location: 'Near West End', available: true, color: 'var(--success-green)' }
+            ];
+
+            // Custom Icon
+            const parkingIcon = L.divIcon({
+                html: '<div class="parking-spot-map-icon">P</div>',
+                className: 'custom-leaflet-div-icon', // Keep this empty or for base styling not specific to availability
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+            });
+
+            const parkingIconVIP = L.divIcon({
+                html: '<div class="parking-spot-map-icon vip">P</div>',
+                className: 'custom-leaflet-div-icon',
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+            });
+
+            spotsData.forEach(spot => {
+                let iconToUse = parkingIcon;
+                if (spot.vip) iconToUse = parkingIconVIP;
+
+                const marker = L.marker([spot.lat, spot.lng], { icon: iconToUse }).addTo(map);
+                marker.on('click', () => {
+                    // Update bottom sheet with more details
+                    document.getElementById('spotTitle').textContent = spot.name;
+                    document.getElementById('spotLocation').textContent = spot.location;
+                    selectSpot(spot.id, spot.price, spot.walk); // Existing function to show bottom sheet
+                });
+
+                // Style the icon's inner div based on availability or specific color
+                // This needs to be done carefully as direct DOM manipulation of Leaflet icons can be tricky
+                // For now, VIP status changes the whole icon. Availability could be a popup or color change.
+            });
+        }
 
         // Navigation Functions
         function showHome() {
@@ -987,6 +1053,17 @@
             document.querySelector('section:first-child').style.display = 'none';
             document.getElementById('spotsListSection').style.display = 'none';
             document.getElementById('mapSection').style.display = 'block';
+            // Ensure map is initialized and sized correctly when shown
+            if (map) {
+                setTimeout(() => {
+                    map.invalidateSize();
+                }, 10);
+            } else {
+                initializeMap(); // Initialize if not already
+                 setTimeout(() => { // Ensure DOM is ready for map
+                    if(map) map.invalidateSize();
+                }, 10);
+            }
         }
 
         function showSpotsList() {
